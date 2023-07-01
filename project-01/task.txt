@@ -1,0 +1,16 @@
+designing a rest api supported with json 
+
+GET/users -> html documet with users
+GET/api/users -> list all users in JSON - done ✅
+
+GET/api/user/1 -> get the user with id 1
+GET/api/user/2 -> get the user with id 2
+
+POST/api/user/ -> create new user
+
+PATCH/api/user/id -> edit the user with id
+
+DELETE/api/users/1 -> delete the user with id 1
+
+
+
