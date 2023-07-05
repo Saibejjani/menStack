@@ -14,7 +14,40 @@ const handleGenerateShortUrl = async (req, res) => {
     visitHistory: [],
   });
 
-  return res.json({ id: shortId });
+  return res.render('Home', { id: shortId });
 };
 
-module.exports = { handleGenerateShortUrl };
+const handleRedirectUrl = async (req, res) => {
+  const shortId = req.params.shortId;
+
+  if (shortId === '') return res.json({ error: 'url id is required' });
+  const entry = await URL.findOneAndUpdate(
+    {
+      shortId,
+    },
+    {
+      $push: {
+        visitHistory: {
+          timestamp: Date.now(),
+        },
+      },
+    }
+  );
+  if (!entry) return res.json({ error: 'url id is required' });
+  return res.redirect(entry.redirectUrl);
+};
+
+const handleGetAnalytics = async (req, res) => {
+  const shortId = req.params.shortId;
+  const result = await URL.findOne({ shortId });
+  return res.json({
+    totalClicks: result.visitHistory.length,
+    analytics: result.visitHistory,
+  });
+};
+
+module.exports = {
+  handleGenerateShortUrl,
+  handleRedirectUrl,
+  handleGetAnalytics,
+};
