@@ -12,6 +12,7 @@ const handleGenerateShortUrl = async (req, res) => {
     shortId: shortId,
     redirectUrl: body.url,
     visitHistory: [],
+    createdBy: req.user._id,
   });
 
   return res.render('Home', { id: shortId });
@@ -39,7 +40,8 @@ const handleRedirectUrl = async (req, res) => {
 
 const handleGetAnalytics = async (req, res) => {
   const shortId = req.params.shortId;
-  const result = await URL.findOne({ shortId });
+  const result = await URL.findOne({ shortId, createdBy: req.user._id });
+  if (!result) return res.json({ error: 'Your not authorised to access' });
   return res.json({
     totalClicks: result.visitHistory.length,
     analytics: result.visitHistory,

@@ -1,9 +1,14 @@
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+
 const { connectToMongoDB } = require('./connect');
+const URL = require('./models/url');
+const { checkForAuthentication, restrictTo } = require('./middleware/auth');
+
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRouter');
-const URL = require('./models/url');
+const userRoute = require('./routes/user');
 const app = express();
 const PORT = 8001;
 
@@ -16,11 +21,15 @@ app.set('views', path.resolve('./views'));
 
 app.get('/test', async (req, res) => {});
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(checkForAuthentication);
 
+app.use('/url', restrictTo(['NORMAL', 'ADMIN']), urlRoute);
+app.use('/user', userRoute);
 app.use('/', staticRoute);
-app.use('/url', urlRoute);
+
 app.listen(PORT, () => {
   console.log(`server started on http://localhost:${PORT}`);
 });
